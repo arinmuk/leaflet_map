@@ -18,11 +18,18 @@ var grayscale = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.pn
   id: "mapbox.light",
   accessToken: API_KEY
 });
+var outdoors = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+  attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+  maxZoom: 18,
+  id: "mapbox.outdoors",
+  accessToken: API_KEY
+});
 // Define a baseMaps object to hold our base layers
 var baseMaps = {
   "Street Map": streetmap,
-  "Satellite Map": satellitemap,
   "Grayscale Map": grayscale,
+  "Satellite Map": satellitemap,
+  "Outdoor Map": outdoors,
 };
 
  
@@ -33,10 +40,26 @@ var baseMaps = {
   zoom: 5,
   layers:[satellitemap,streetmap,grayscale]
 });
+var plates=''
 
-
-
+file = "plates.geojson"
 url="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
+
+d3.json(file, function(data) {
+  // Creating a GeoJSON layer with the retrieved data
+  var plates = L.geoJson(data, {
+    style: function(feature) {
+      return {
+        color: "orange",
+        fillColor: "yellow",
+        fillOpacity: 1,
+        weight: 3.5
+      };
+    }
+  }).addTo(myMap);
+});
+
+
 
 d3.json(url, function(data) {
   //   // Once we get a response, send the data.features object to the createFeatures function
@@ -89,7 +112,8 @@ function createMap(earthquakes) {
 
   // Create overlay object to hold our overlay layer
   var overlayMaps = {
-    Earthquakes: earthquakes 
+    Earthquakes: earthquakes,
+   
   };
 
   // Create a layer control
@@ -121,37 +145,6 @@ legend.onAdd = function(myMap) {
 legend.addTo(myMap);
 
 // Initialize an object containing icons for each layer group
-var icons = {
-  COMING_SOON: L.ExtraMarkers.icon({
-    icon: "ion-settings",
-    iconColor: "white",
-    markerColor: "yellow",
-    shape: "star"
-  }),
-  EMPTY: L.ExtraMarkers.icon({
-    icon: "ion-android-bicycle",
-    iconColor: "white",
-    markerColor: "red",
-    shape: "circle"
-  }),
-  OUT_OF_ORDER: L.ExtraMarkers.icon({
-    icon: "ion-minus-circled",
-    iconColor: "white",
-    markerColor: "blue-dark",
-    shape: "penta"
-  }),
-  LOW: L.ExtraMarkers.icon({
-    icon: "ion-android-bicycle",
-    iconColor: "white",
-    markerColor: "orange",
-    shape: "circle"
-  }),
-  NORMAL: L.ExtraMarkers.icon({
-    icon: "ion-android-bicycle",
-    iconColor: "white",
-    markerColor: "green",
-    shape: "circle"
-  })}
 
 
 
