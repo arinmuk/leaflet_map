@@ -12,10 +12,17 @@ var streetmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.pn
   id: "mapbox.streets",
   accessToken: API_KEY
 });
+var grayscale = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+  attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+  maxZoom: 18,
+  id: "mapbox.light",
+  accessToken: API_KEY
+});
 // Define a baseMaps object to hold our base layers
 var baseMaps = {
   "Street Map": streetmap,
-  "Satellite Map": satellitemap
+  "Satellite Map": satellitemap,
+  "Grayscale Map": grayscale,
 };
 
  
@@ -24,7 +31,7 @@ var baseMaps = {
  var myMap = L.map("map", {
  center: [37.09, -95.71],
   zoom: 5,
-  layers:[satellitemap,streetmap]
+  layers:[satellitemap,streetmap,grayscale]
 });
 
 
@@ -38,11 +45,12 @@ d3.json(url, function(data) {
 
 
    function getColor(mag) {
-    return mag >= 5  ? '#B10026' :
-           mag >= 4  ? '#e31a1c' :
-           mag >= 3  ? '#fc4e2a' :
-           mag >= 2  ? '#fd8d3c' :
-           mag >= 1  ? '#feb24c' :
+    return mag >= 5  ? '#800026' :
+           mag >= 4  ? '#B10026' :
+           mag >= 3  ? '#e31a1c' :
+           mag >= 2  ? '#fc4e2a' :
+           mag >= 1  ? '#fd8d3c' :
+           mag >= 0  ? '#feb24c' :
                       '#fed976';
   }
 
@@ -90,6 +98,67 @@ function createMap(earthquakes) {
   L.control.layers(baseMaps, overlayMaps, {
     collapsed: false
   }).addTo(myMap);
+
+
+// Create a legend to display information about our map
+var legend  = L.control({
+  position: "bottomright"
+});
+
+// When the layer control is added, insert a div with the class of "legend"
+legend.onAdd = function(myMap) {
+  var div = L.DomUtil.create("div", "legend"),
+        magnitude = [0, 1, 2, 3, 4,5],
+        labels = [];
+        for (var i = 0; i < magnitude.length; i++) {
+          div.innerHTML +=
+              '<i style="background:' + getColor(magnitude[i] + 1) + '"></i> ' +
+              magnitude[i] + (magnitude[i + 1] ? '&ndash;' + magnitude[i + 1] + '<br>' : '+');
+      }
+  return div;
+};
+// Add the info legend to the map
+legend.addTo(myMap);
+
+// Initialize an object containing icons for each layer group
+var icons = {
+  COMING_SOON: L.ExtraMarkers.icon({
+    icon: "ion-settings",
+    iconColor: "white",
+    markerColor: "yellow",
+    shape: "star"
+  }),
+  EMPTY: L.ExtraMarkers.icon({
+    icon: "ion-android-bicycle",
+    iconColor: "white",
+    markerColor: "red",
+    shape: "circle"
+  }),
+  OUT_OF_ORDER: L.ExtraMarkers.icon({
+    icon: "ion-minus-circled",
+    iconColor: "white",
+    markerColor: "blue-dark",
+    shape: "penta"
+  }),
+  LOW: L.ExtraMarkers.icon({
+    icon: "ion-android-bicycle",
+    iconColor: "white",
+    markerColor: "orange",
+    shape: "circle"
+  }),
+  NORMAL: L.ExtraMarkers.icon({
+    icon: "ion-android-bicycle",
+    iconColor: "white",
+    markerColor: "green",
+    shape: "circle"
+  })}
+
+
+
+
+
+
+
 }
 
 
