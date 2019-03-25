@@ -37,7 +37,7 @@ var baseMaps = {
  
  var myMap = L.map("map", {
  center: [37.09, -95.71],
-  zoom: 5,
+  zoom: 4,
   layers:[satellitemap,streetmap,grayscale]
 });
 var plates=''
@@ -47,7 +47,7 @@ url="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
 
 d3.json(file, function(data) {
   // Creating a GeoJSON layer with the retrieved data
-  var plates = L.geoJson(data, {
+  plates = L.geoJson(data, {
     style: function(feature) {
       return {
         color: "orange",
@@ -57,6 +57,7 @@ d3.json(file, function(data) {
       };
     }
   }).addTo(myMap);
+  
 });
 
 
@@ -113,7 +114,7 @@ function createMap(earthquakes) {
   // Create overlay object to hold our overlay layer
   var overlayMaps = {
     Earthquakes: earthquakes,
-   
+    "Fault Lines":plates
   };
 
   // Create a layer control
@@ -130,7 +131,7 @@ var legend  = L.control({
 });
 
 // When the layer control is added, insert a div with the class of "legend"
-legend.onAdd = function(myMap) {
+legend.onAdd = function() {
   var div = L.DomUtil.create("div", "legend"),
         magnitude = [0, 1, 2, 3, 4,5],
         labels = [];
